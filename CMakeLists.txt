@@ -5,8 +5,6 @@ project(gears)
 set(CMAKE_CXX_STANDARD 17)
 
 find_package(plog CONFIG REQUIRED)
-find_package(jsoncpp CONFIG REQUIRED)
-find_package(CURL CONFIG REQUIRED)
 
 set(GEARS_SRCS
     src/http_client.cpp
@@ -15,4 +13,4 @@ set(GEARS_SRCS
 )
 
 add_library(gears ${GEARS_SRCS})
-target_link_libraries(gears PRIVATE plog::plog JsonCpp::JsonCpp CURL::libcurl)
+target_link_libraries(gears PRIVATE plog::plog)
