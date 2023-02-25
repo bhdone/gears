@@ -47,7 +47,7 @@ public:
     RPCClient(bool no_proxy, std::string url, std::string user, std::string passwd);
 
     template <typename... T>
-    Result Call(std::string_view method_name, T&&... vals) {
+    Result Call(std::string const& method_name, T&&... vals) {
         return SendMethod(m_no_proxy, method_name, std::forward<T>(vals)...);
     }
 
