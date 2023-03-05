@@ -11,7 +11,7 @@ ExternalProject_Add(
     univalue
     GIT_REPOSITORY https://github.com/jgarzik/univalue
     GIT_TAG d6715ee16ed57bfbfc64e023dcb05151b6654aa4
-    CONFIGURE_COMMAND ./autogen.sh && ./configure
+    CONFIGURE_COMMAND test ! -f configure && ./autogen.sh && ./configure || exit 0
     BUILD_IN_SOURCE 1
 )
 
