@@ -48,8 +48,8 @@ TEST(MakeArg, Bytes)
 {
     Bytes src(10, '\0');
     auto arg = MakeArg(src);
-    EXPECT_TRUE(arg.isString());
-    EXPECT_EQ(BytesToHex(src), arg.asString());
+    EXPECT_TRUE(arg.isStr());
+    EXPECT_EQ(BytesToHex(src), arg.get_str());
 }
 
 TEST(MakeArgs, Array)
@@ -60,6 +60,6 @@ TEST(MakeArgs, Array)
         src[i] = i;
     }
     auto arg = MakeArg<LEN>(src);
-    EXPECT_TRUE(arg.isString());
-    EXPECT_EQ(BytesToHex(MakeBytes(src)), arg.asString());
+    EXPECT_TRUE(arg.isStr());
+    EXPECT_EQ(BytesToHex(MakeBytes(src)), arg.get_str());
 }

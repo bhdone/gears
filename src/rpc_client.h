@@ -1,11 +1,7 @@
 #ifndef BHD_MINER_RPC_CLIENT_HPP
 #define BHD_MINER_RPC_CLIENT_HPP
 
-#include <curl/curl.h>
-#include <plog/Log.h>
-
-#include <json/value.h>
-#include <json/reader.h>
+#include <univalue.h>
 
 #include <cstdint>
 
@@ -57,18 +53,18 @@ private:
     std::string m_msg;
 };
 
-Json::Value MakeArg(std::string const& str);
+UniValue MakeArg(std::string const& str);
 
-Json::Value MakeArg(std::string_view str);
+UniValue MakeArg(std::string_view str);
 
-template <typename T> Json::Value MakeArg(T int_val, std::is_integral<T>&)
+template <typename T> UniValue MakeArg(T int_val, std::is_integral<T>&)
 {
-    return Json::Value(static_cast<Json::Int64>(int_val));
+    return UniValue(UniValue::VNUM, int_val);
 }
 
-Json::Value MakeArg(Bytes const& data);
+UniValue MakeArg(Bytes const& data);
 
-template <int N> Json::Value MakeArg(std::array<uint8_t, N> const& data)
+template <int N> UniValue MakeArg(std::array<uint8_t, N> const& data)
 {
     return MakeArg(MakeBytes(data));
 }
@@ -77,7 +73,7 @@ class RPCClient
 {
 public:
     struct Result {
-        Json::Value result;
+        UniValue result;
         std::string error;
         int id;
     };
@@ -90,21 +86,21 @@ public:
 
     template <typename... T> Result Call(std::string const& method_name, T&&... vals)
     {
-        Json::Value params;
+        UniValue params(UniValue::VARR);
         MakeParams(params, std::forward<T>(vals)...);
         return SendMethod(m_no_proxy, method_name, params);
     }
 
 private:
-    void MakeParams(Json::Value const&) { }
+    void MakeParams(UniValue const&) { }
 
-    template <typename T, typename... Ts> void MakeParams(Json::Value& out_params, T&& val, Ts&&... vals)
+    template <typename T, typename... Ts> void MakeParams(UniValue& out_params, T&& val, Ts&&... vals)
     {
-        out_params.append(MakeArg(std::forward<T>(val)));
+        out_params.push_back(MakeArg(std::forward<T>(val)));
         MakeParams(out_params, std::forward<Ts>(vals)...);
     }
 
-    Result SendMethod(bool no_proxy, std::string const& method_name, Json::Value const& params);
+    Result SendMethod(bool no_proxy, std::string const& method_name, UniValue const& params);
 
 private:
     bool m_no_proxy;
