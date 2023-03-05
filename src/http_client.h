@@ -14,7 +14,7 @@ public:
 
     ~HTTPClient();
 
-    std::tuple<bool, int, std::string> Send(std::string const& buff);
+    std::tuple<int, std::string> Send(std::string const& buff);
 
     Bytes GetReceivedData() const;
 

@@ -15,7 +15,7 @@ HTTPClient::HTTPClient(std::string url, std::string user, std::string passwd, bo
 
 HTTPClient::~HTTPClient() { curl_easy_cleanup(m_curl); }
 
-std::tuple<bool, int, std::string> HTTPClient::Send(std::string const& buff) {
+std::tuple<int, std::string> HTTPClient::Send(std::string const& buff) {
     curl_easy_setopt(m_curl, CURLOPT_URL, m_url.c_str());
 
     curl_slist* header_list;
@@ -50,10 +50,10 @@ std::tuple<bool, int, std::string> HTTPClient::Send(std::string const& buff) {
     if (code != CURLE_OK) {
         std::stringstream ss;
         ss << "curl returns error: code=" << code << ", " << curl_easy_strerror(code);
-        return std::make_tuple(false, code, ss.str());
+        return std::make_tuple(code, ss.str());
     }
 
-    return std::make_tuple(true, code, "");
+    return std::make_tuple(code, "");
 }
 
 Bytes HTTPClient::GetReceivedData() const { return m_recv_data; }
