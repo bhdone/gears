@@ -94,6 +94,8 @@ public:
     }
 
 private:
+    void MakeParams(Json::Value const&) { }
+
     template <typename T, typename... Ts> void MakeParams(Json::Value& out_params, T&& val, Ts&&... vals)
     {
         out_params.append(MakeArg(std::forward<T>(val)));
