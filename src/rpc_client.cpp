@@ -31,6 +31,19 @@ RPCClient::RPCClient(bool no_proxy, std::string url, std::string const& cookie_p
         throw std::runtime_error("cookie is empty, cannot connect to btchd core");
     }
 
+    LoadCookie(cookie_path_str);
+}
+
+RPCClient::RPCClient(bool no_proxy, std::string url, std::string user, std::string passwd)
+    : m_no_proxy(no_proxy)
+    , m_url(std::move(url))
+    , m_user(std::move(user))
+    , m_passwd(std::move(passwd))
+{
+}
+
+void RPCClient::LoadCookie(std::string_view cookie_path_str)
+{
     fs::path cookie_path(cookie_path_str);
     std::ifstream cookie_reader(cookie_path.string());
     if (!cookie_reader.is_open()) {
@@ -48,14 +61,6 @@ RPCClient::RPCClient(bool no_proxy, std::string url, std::string const& cookie_p
     std::string passwd_str = auth_str.substr(pos + 1);
     m_user = std::move(user_str);
     m_passwd = std::move(passwd_str);
-}
-
-RPCClient::RPCClient(bool no_proxy, std::string url, std::string user, std::string passwd)
-    : m_no_proxy(no_proxy)
-    , m_url(std::move(url))
-    , m_user(std::move(user))
-    , m_passwd(std::move(passwd))
-{
 }
 
 RPCClient::Result RPCClient::SendMethod(bool no_proxy, std::string const& method_name, Json::Value const& params)

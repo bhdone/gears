@@ -86,6 +86,8 @@ public:
 
     RPCClient(bool no_proxy, std::string url, std::string user, std::string passwd);
 
+    void LoadCookie(std::string_view cookie_path_str);
+
     template <typename... T> Result Call(std::string const& method_name, T&&... vals)
     {
         Json::Value params;
