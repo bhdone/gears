@@ -7,8 +7,6 @@ option(ENABLE_TEST "Compile and run tests" ON)
 set(CMAKE_CXX_STANDARD 17)
 
 find_package(plog CONFIG REQUIRED)
-find_package(jsoncpp CONFIG REQUIRED)
-find_package(CURL CONFIG REQUIRED)
 
 set(GEARS_SRCS
     src/http_client.cpp
@@ -23,6 +21,8 @@ if (ENABLE_TEST)
     enable_testing()
 
     find_package(GTest CONFIG REQUIRED)
+    find_package(jsoncpp CONFIG REQUIRED)
+    find_package(CURL CONFIG REQUIRED)
 
     set(GEARS_TEST_SRCS
         ./src/utils.cpp
