@@ -57,6 +57,9 @@ RPCClient::Result RPCClient::SendMethod(bool no_proxy, std::string const& method
     if (received_data.empty()) {
         throw NetError("empty result from RPC server");
     }
+    int n = received_data.size();
+    received_data.resize(n + 1);
+    received_data[n] = '\0';
     char const* psz = reinterpret_cast<char const*>(received_data.data());
     UniValue res;
     bool succ = res.read(psz);
