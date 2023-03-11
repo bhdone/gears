@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.5)
 
 project(gears)
 
@@ -6,12 +6,14 @@ option(ENABLE_TEST "Compile and run tests" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
+find_package(CURL CONFIG REQUIRED)
+
 include(ExternalProject)
 ExternalProject_Add(
     univalue
     GIT_REPOSITORY https://github.com/jgarzik/univalue
     GIT_TAG d6715ee16ed57bfbfc64e023dcb05151b6654aa4
-    CONFIGURE_COMMAND test ! -f configure && ./autogen.sh && ./configure || exit 0
+    CONFIGURE_COMMAND test ! -f configure && ./autogen.sh && ./configure --prefix=${CMAKE_BINARY_DIR} || exit 0
     BUILD_IN_SOURCE 1
 )
 
@@ -39,14 +41,16 @@ set(GEARS_SRCS
 )
 
 add_library(gears ${GEARS_SRCS})
+target_link_libraries(gears PRIVATE CURL::libcurl)
 add_dependencies(gears univalue tinyformat)
 
 if (ENABLE_TEST)
     enable_testing()
 
     find_package(GTest CONFIG REQUIRED)
-    find_package(CURL CONFIG REQUIRED)
-    find_library(UniValue_Lib NAMES univalue HINTS ${SOURCE_DIR})
+
+    set(univaluelib ${CMAKE_BINARY_DIR}/lib/libunivalue.a)
+    set_source_files_properties(${univaluelib} PROPERTIES GENERATED TRUE)
 
     set(GEARS_TEST_SRCS
         ${GEARS_SRCS}
@@ -54,5 +58,6 @@ if (ENABLE_TEST)
     )
 
     add_executable(gears_test ${GEARS_TEST_SRCS})
-    target_link_libraries(gears_test PRIVATE GTest::gtest GTest::gtest_main CURL::libcurl ${UniValue_Lib})
+    add_dependencies(gears_test univalue)
+    target_link_libraries(gears_test PRIVATE GTest::gtest GTest::gtest_main CURL::libcurl ${univaluelib})
 endif()
