@@ -1,5 +1,7 @@
 #include "http_client.h"
 
+#include <cstring>
+
 #include <tinyformat.h>
 
 HTTPClient::HTTPClient(std::string url, std::string user, std::string passwd, bool no_proxy)
