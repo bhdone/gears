@@ -32,6 +32,13 @@ std::tuple<int, std::string> HTTPClient::Send(std::string const& buff)
     curl_easy_setopt(m_curl, CURLOPT_PASSWORD, m_passwd.c_str());
     curl_easy_setopt(m_curl, CURLOPT_POSTFIELDSIZE, buff.size());
 
+    if (m_no_proxy) {
+        CURLcode code = curl_easy_setopt(m_curl, CURLOPT_PROXY, "");
+        if (code != CURLE_OK) {
+            return std::make_tuple(code, tinyformat::format("curl_easy_setopt CURLOPT_PROXY error: code=%d, %s", code, curl_easy_strerror(code)));
+        }
+    }
+
     curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, this);
     curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, &HTTPClient::RecvCallback);
 
