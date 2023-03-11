@@ -13,6 +13,7 @@
 #include <type_traits>
 
 #include "http_client.h"
+#include "rpc_login.hpp"
 
 #include "utils.h"
 #include "types.h"
@@ -80,11 +81,7 @@ public:
         int id;
     };
 
-    RPCClient(bool no_proxy, std::string url, std::string const& cookie_path_str = "");
-
-    RPCClient(bool no_proxy, std::string url, std::string user, std::string passwd);
-
-    void LoadCookie(std::string_view cookie_path_str);
+    RPCClient(bool no_proxy, std::string url, RPCLogin login);
 
     template <typename... T> Result Call(std::string const& method_name, T&&... vals)
     {
@@ -107,8 +104,7 @@ private:
 private:
     bool m_no_proxy;
     std::string m_url;
-    std::string m_user;
-    std::string m_passwd;
+    RPCLogin m_login;
 };
 
 #endif

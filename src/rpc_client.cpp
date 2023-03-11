@@ -23,44 +23,11 @@ UniValue MakeArg(Bytes const& data)
     return UniValue(UniValue::VSTR, BytesToHex(data));
 }
 
-RPCClient::RPCClient(bool no_proxy, std::string url, std::string const& cookie_path_str)
+RPCClient::RPCClient(bool no_proxy, std::string url, RPCLogin login)
     : m_no_proxy(no_proxy)
     , m_url(std::move(url))
+    , m_login(std::move(login))
 {
-    if (cookie_path_str.empty()) {
-        throw std::runtime_error("cookie is empty, cannot connect to btchd core");
-    }
-
-    LoadCookie(cookie_path_str);
-}
-
-RPCClient::RPCClient(bool no_proxy, std::string url, std::string user, std::string passwd)
-    : m_no_proxy(no_proxy)
-    , m_url(std::move(url))
-    , m_user(std::move(user))
-    , m_passwd(std::move(passwd))
-{
-}
-
-void RPCClient::LoadCookie(std::string_view cookie_path_str)
-{
-    fs::path cookie_path(cookie_path_str);
-    std::ifstream cookie_reader(cookie_path.string());
-    if (!cookie_reader.is_open()) {
-        std::stringstream ss;
-        ss << "cannot open to read " << cookie_path;
-        throw std::runtime_error(ss.str());
-    }
-    std::string auth_str;
-    std::getline(cookie_reader, auth_str);
-    if (auth_str.empty()) {
-        throw std::runtime_error("cannot read auth string from `.cookie`");
-    }
-    auto pos = auth_str.find_first_of(':');
-    std::string user_str = auth_str.substr(0, pos);
-    std::string passwd_str = auth_str.substr(pos + 1);
-    m_user = std::move(user_str);
-    m_passwd = std::move(passwd_str);
 }
 
 RPCClient::Result RPCClient::SendMethod(bool no_proxy, std::string const& method_name, UniValue const& params)
@@ -69,8 +36,13 @@ RPCClient::Result RPCClient::SendMethod(bool no_proxy, std::string const& method
     root.pushKV("jsonrpc", "2.0");
     root.pushKV("method", method_name);
     root.pushKV("params", params);
+    // Retrieve user/passwd from rpc login
+    auto plogin = m_login.GetUserPasswd();
+    if (!plogin.has_value()) {
+        throw NetError("cannot retrieve the user/passwd to connect the rpc service");
+    }
     // Invoke curl
-    HTTPClient client(m_url, m_user, m_passwd, no_proxy);
+    HTTPClient client(m_url, plogin->first, plogin->second, no_proxy);
     std::string send_str = root.write();
     int code;
     std::string err_str;
