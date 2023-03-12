@@ -9,6 +9,8 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
+#include <tinyformat.h>
+
 class RPCLogin
 {
 public:
@@ -38,9 +40,7 @@ public:
             fs::path cookie_path(cookie_path_str_);
             std::ifstream cookie_reader(cookie_path.string());
             if (!cookie_reader.is_open()) {
-                std::stringstream ss;
-                ss << "cannot open to read " << cookie_path;
-                throw std::runtime_error(ss.str());
+                throw std::runtime_error(tinyformat::format("cannot open to read %s", cookie_path));
             }
             std::string auth_str;
             std::getline(cookie_reader, auth_str);
