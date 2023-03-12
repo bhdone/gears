@@ -30,7 +30,7 @@ ExternalProject_Add(
     TEST_COMMAND ""
 )
 ExternalProject_Get_Property(tinyformat SOURCE_DIR)
-set(tinyformat_Include ${SOURCE_DIR})
+set(tinyformat_Include ${SOURCE_DIR} CACHE INTERNAL "tinyformat_Include")
 
 include_directories(${UniValue_Include} ${tinyformat_Include})
 
