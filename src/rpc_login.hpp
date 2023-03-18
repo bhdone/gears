@@ -37,10 +37,13 @@ public:
             return std::make_pair(user_, passwd_);
         }
         if (fs::exists(cookie_path_str_) && fs::is_regular_file(cookie_path_str_)) {
-            fs::path cookie_path(cookie_path_str_);
-            std::ifstream cookie_reader(cookie_path.string());
-            if (!cookie_reader.is_open()) {
-                throw std::runtime_error(tinyformat::format("cannot open to read %s", cookie_path));
+            // fs::path cookie_path(cookie_path_str_);
+            std::ifstream cookie_reader;
+            cookie_reader.exceptions(cookie_reader.exceptions() | std::ios::failbit);
+            try {
+                cookie_reader.open(cookie_path_str_);
+            } catch (std::ios_base::failure const& e) {
+                throw std::runtime_error(tinyformat::format("failed to open file %s, err: %s", cookie_path_str_, e.what()));
             }
             std::string auth_str;
             std::getline(cookie_reader, auth_str);
