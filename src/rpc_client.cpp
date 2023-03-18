@@ -5,9 +5,6 @@
 
 #include <fstream>
 
-#include <filesystem>
-namespace fs = std::filesystem;
-
 UniValue MakeArg(std::string const& str)
 {
     return UniValue(UniValue::VSTR, str);
