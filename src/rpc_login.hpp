@@ -29,7 +29,10 @@ public:
     {
     }
 
-    Type GetType() const { return type_; }
+    Type GetType() const
+    {
+        return type_;
+    }
 
     std::optional<std::pair<std::string, std::string>> GetUserPasswd() const
     {
