@@ -35,7 +35,9 @@ std::tuple<int, std::string> HTTPClient::Send(std::string const& buff)
     if (m_no_proxy) {
         CURLcode code = curl_easy_setopt(m_curl, CURLOPT_PROXY, "");
         if (code != CURLE_OK) {
-            return std::make_tuple(code, tinyformat::format("curl_easy_setopt CURLOPT_PROXY error: code=%d, %s", code, curl_easy_strerror(code)));
+            return std::make_tuple(code,
+                    tinyformat::format(
+                            "curl_easy_setopt CURLOPT_PROXY error: code=%d, %s", code, curl_easy_strerror(code)));
         }
     }
 
@@ -47,7 +49,8 @@ std::tuple<int, std::string> HTTPClient::Send(std::string const& buff)
     curl_slist_free_all(header_list);
 
     if (code != CURLE_OK) {
-        return std::make_tuple(code, tinyformat::format("curl returns error: code=%d, %s", code, curl_easy_strerror(code)));
+        return std::make_tuple(
+                code, tinyformat::format("curl returns error: code=%d, %s", code, curl_easy_strerror(code)));
     }
 
     return std::make_tuple(code, "");
