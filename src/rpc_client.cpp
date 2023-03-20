@@ -29,24 +29,23 @@ RPCClient::RPCClient(bool no_proxy, std::string url, RPCLogin login)
 
 RPCClient::Result RPCClient::SendMethod(bool no_proxy, std::string const& method_name, UniValue const& params)
 {
+    if (!m_login.Valid()) {
+        m_login.ReloadFromCookie();
+    }
     UniValue root(UniValue::VOBJ);
     root.pushKV("jsonrpc", "2.0");
     root.pushKV("method", method_name);
     root.pushKV("params", params);
     // Retrieve user/passwd from rpc login
-    auto plogin = m_login.GetUserPasswd();
-    if (!plogin.has_value()) {
-        throw NetError("cannot retrieve the user/passwd to connect the rpc service");
-    }
+    auto login = m_login.GetUserPasswd();
     // Invoke curl
-    HTTPClient client(m_url, plogin->first, plogin->second, no_proxy);
+    HTTPClient client(m_url, login.first, login.second, no_proxy);
     std::string send_str = root.write();
     int code;
     std::string err_str;
     std::tie(code, err_str) = client.Send(send_str);
     if (code != CURLE_OK) {
-        std::stringstream ss;
-        ss << "RPC command error `" << method_name << "`: " << err_str;
+        m_login.SetInvalid();
         throw NetError(tinyformat::format("RPC command error `%s`: %s", method_name, err_str).c_str());
     }
     // Analyze the result
