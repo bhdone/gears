@@ -60,10 +60,7 @@ UniValue MakeArg(std::string const& str);
 
 UniValue MakeArg(std::string_view str);
 
-template <typename T> UniValue MakeArg(T int_val, std::is_integral<T>&)
-{
-    return UniValue(UniValue::VNUM, int_val);
-}
+UniValue MakeArg(int64_t val);
 
 UniValue MakeArg(Bytes const& data);
 

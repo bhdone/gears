@@ -15,6 +15,11 @@ UniValue MakeArg(std::string_view str)
     return UniValue(UniValue::VSTR, std::string(str));
 }
 
+UniValue MakeArg(int64_t val)
+{
+    return UniValue(val);
+}
+
 UniValue MakeArg(Bytes const& data)
 {
     return UniValue(UniValue::VSTR, BytesToHex(data));
