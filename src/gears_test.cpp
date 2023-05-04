@@ -63,3 +63,24 @@ TEST(MakeArgs, Array)
     EXPECT_TRUE(arg.isStr());
     EXPECT_EQ(BytesToHex(MakeBytes(src)), arg.get_str());
 }
+
+char const* SZ_RPC_URL = "http://127.0.0.1:18732";
+char const* SZ_RPC_COOKIE_PATH = "$HOME/.btchd/testnet3/.cookie";
+
+class RPCTest : public testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        rpc_ = std::make_unique<RPCClient>(true, SZ_RPC_URL, RPCLogin(ExpandEnvPath(SZ_RPC_COOKIE_PATH)));
+    }
+
+    void TearDown() override { }
+
+    std::unique_ptr<RPCClient> rpc_;
+};
+
+TEST_F(RPCTest, Connect)
+{
+    EXPECT_NO_THROW({ rpc_->Call("querychallenge"); });
+}
