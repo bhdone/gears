@@ -15,10 +15,13 @@ ExternalProject_Add(
     GIT_TAG d6715ee16ed57bfbfc64e023dcb05151b6654aa4
     CONFIGURE_COMMAND test ! -f configure && ./autogen.sh && ./configure --prefix=${CMAKE_BINARY_DIR} || exit 0
     BUILD_IN_SOURCE 1
+    INSTALL_COMMAND ""
 )
 
 ExternalProject_Get_Property(univalue SOURCE_DIR)
-set(UniValue_Include ${SOURCE_DIR}/include)
+
+set(UniValue_Include "${SOURCE_DIR}/include" CACHE INTERNAL "The include dir for UniValue")
+set(UniValue_Lib "${SOURCE_DIR}/.libs/libunivalue.a" CACHE INTERNAL "The lib dir for UniValue")
 
 ExternalProject_Add(
     tinyformat
@@ -49,7 +52,6 @@ if (ENABLE_TEST)
 
     find_package(GTest CONFIG REQUIRED)
 
-    set(univaluelib ${CMAKE_BINARY_DIR}/lib/libunivalue.a)
     set_source_files_properties(${univaluelib} PROPERTIES GENERATED TRUE)
 
     set(GEARS_TEST_SRCS
@@ -59,5 +61,5 @@ if (ENABLE_TEST)
 
     add_executable(gears_test ${GEARS_TEST_SRCS})
     add_dependencies(gears_test univalue)
-    target_link_libraries(gears_test PRIVATE GTest::gtest GTest::gtest_main CURL::libcurl ${univaluelib})
+    target_link_libraries(gears_test PRIVATE GTest::gtest GTest::gtest_main CURL::libcurl ${UniValue_Lib})
 endif()
